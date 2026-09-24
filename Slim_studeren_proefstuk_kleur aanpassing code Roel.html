@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slim studeren</title>
+<style>
+  :root{
+    --ink:#384166; --paper:#FBFFFF; --accent:#4F8343; --accent2:#5F7F5B;
+    --softer:#f4f7f4; --green-tint:#eef5ee; --border:#c8d4c8;
+    --niet-bg:#f2f2f6; --niet-border:#c3c8d6; --rood:#b8503f;
+    --c1:#B7842B; --t1:#FAF4E6; --c2:#4F8343; --t2:#eef5ee;
+    --c3:#3F6FA3; --t3:#EAF1F8; --c4:#7E5A93; --t4:#F2ECF6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{background:var(--softer); color:var(--ink); font-family:Verdana, Geneva, sans-serif; line-height:1.55; padding:24px 16px 64px;}
+  .sheet{max-width:900px; margin:0 auto;}
+  [hidden]{display:none !important;}
+  svg.ico{fill:none; vertical-align:middle;}
+  svg.ico use{}
+
+  .top{background:var(--paper); border:1.5px solid var(--border); border-radius:14px; padding:22px 26px; margin-bottom:14px;}
+  .school{font-size:11px; font-weight:bold; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2);}
+  .title{font-size:clamp(32px,7vw,52px); font-weight:900; line-height:1.02; margin-top:4px;}
+  .title .accent{color:var(--accent); font-style:italic;}
+  .rule{height:3px; background:var(--ink); border-radius:3px; margin-top:12px;}
+
+  .demo-bar{background:var(--green-tint); border:1.5px solid var(--accent2); border-radius:12px; padding:12px 16px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; justify-content:space-between;}
+  .demo-text{font-size:12px; max-width:50ch;}
+  .toggle{display:inline-flex; background:var(--paper); border:1.5px solid var(--accent2); border-radius:999px; padding:3px;}
+  .toggle button{font-family:inherit; font-size:12px; font-weight:bold; color:var(--accent2); background:transparent; border:none; border-radius:999px; padding:7px 14px; cursor:pointer;}
+  .toggle button[aria-pressed="true"]{background:var(--ink); color:#fff;}
+  .toggle button:focus-visible{outline:3px solid #6FAC53; outline-offset:2px;}
+
+  .flow{display:flex; flex-direction:column;}
+  .fase{border:2px solid var(--c,var(--ink)); border-left-width:9px; border-radius:14px; padding:15px 18px 18px; background:var(--t,var(--paper));}
+  .fase.f1{--c:var(--c1); --t:var(--t1);}
+  .fase.f2{--c:var(--c2); --t:var(--t2);}
+  .fase.f3{--c:var(--c3); --t:var(--t3);}
+  .fase.f4{--c:var(--c4); --t:var(--t4);}
+  .fase-head{display:flex; align-items:center; gap:13px;}
+  .fase-num{flex:none; width:38px; height:38px; border-radius:50%; background:var(--c,var(--ink)); color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:900;}
+  .fase-naam{font-size:clamp(17px,3.3vw,23px); font-weight:900; text-transform:uppercase; color:var(--ink);}
+  .fase-ico{width:30px; height:30px; color:var(--c); margin-left:auto; flex:none;}
+  .fase-ico use{stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .fase-logica{font-size:11.5px; font-style:italic; color:var(--c,var(--accent2)); margin:6px 0 12px 51px; opacity:.95;}
+  .noodzaak{font-size:16px; font-weight:800; color:var(--c); margin:9px 0 3px 51px;}
+  .noodzaak b{font-size:19px; padding:0 3px;}
+  .noodzaak-box{display:flex; align-items:center; gap:13px; margin:10px 0 6px; background:var(--t1); border:2px solid var(--c1); border-radius:11px; padding:12px 15px;}
+  .noodzaak-box .nb-ico{width:28px; height:28px; color:var(--c1); flex:none;}
+  .noodzaak-box .nb-ico use{stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .noodzaak-titel{font-size:18px; font-weight:900; color:var(--ink); line-height:1.15;}
+  .noodzaak-titel b{color:var(--c1); padding:0 2px;}
+  .noodzaak-sub{font-size:12px; color:var(--c1); font-weight:bold; margin-top:3px;}
+
+  .connector{display:flex; justify-content:center; align-items:center; height:30px; color:#9aa4b6;}
+  .connector svg{width:20px; height:30px;}
+
+  .items{display:grid; gap:10px; margin-top:4px;}
+  .items.drie{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:640px){ .items.drie{grid-template-columns:1fr;} }
+
+  details.reveal{background:var(--paper); border:1.5px solid var(--border); border-radius:10px; overflow:hidden;}
+  details.reveal > summary{list-style:none; cursor:pointer; padding:11px 13px; display:flex; align-items:center; gap:10px; font-size:14.5px; font-weight:bold; color:var(--ink);}
+  details.reveal > summary::-webkit-details-marker{display:none;}
+  details.reveal > summary:focus-visible{outline:3px solid #6FAC53; outline-offset:-3px; border-radius:10px;}
+  .sum-ico{flex:none; width:19px; height:19px; color:var(--c,var(--accent));}
+  .sum-ico use{stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .chev{flex:none; width:16px; height:16px; transition:transform .25s ease; color:var(--accent2); margin-left:auto;}
+  .chev use{stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
+  details.reveal[open] .chev{transform:rotate(90deg);}
+  .body{display:grid; grid-template-rows:0fr; transition:grid-template-rows .28s ease;}
+  details.reveal[open] > .body{grid-template-rows:1fr;}
+  .body > .inner{overflow:hidden;}
+  .body .inner-pad{padding:0 13px 12px; font-size:12.5px; color:var(--ink);}
+  .body .inner-pad p{margin-bottom:7px;}
+  .body .inner-pad ul, .body .inner-pad ol{padding-left:18px; margin:4px 0;}
+  .body .inner-pad li{margin-bottom:5px;}
+  .body .inner-pad b{color:var(--ink);}
+  .fiche-ref{color:var(--c,var(--accent)); font-weight:bold; font-style:italic;}
+  .subitems{display:grid; gap:8px; margin-top:10px; padding-left:11px; border-left:2px solid var(--border);}
+  .subitems details.reveal{background:var(--softer);}
+
+  /* Doorklik-kaarten */
+  .kaart-link{position:relative; text-align:left; font-family:inherit; cursor:pointer; background:var(--paper); border:2px solid var(--c,var(--accent2)); border-radius:12px; padding:18px 16px 15px; display:flex; flex-direction:column; gap:8px;}
+  .kaart-link.k1,.kaart-link.k2,.kaart-link.k3{--c:var(--c2);}
+  .kaart-link.k4{--c:var(--c3);} .kaart-link.k5{--c:var(--c4);}
+  .kaart-link:hover{box-shadow:0 3px 0 var(--c);}
+  .kaart-link:focus-visible{outline:3px solid #6FAC53; outline-offset:2px;}
+  .kaart-tag{position:absolute; top:11px; right:13px; font-size:10px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; color:var(--c); opacity:.7;}
+  .kaart-ico{width:48px; height:48px; color:var(--c);}
+  .kaart-ico use{stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .kaart-label{font-size:10px; font-weight:bold; letter-spacing:.1em; text-transform:uppercase; color:var(--c);}
+  .kaart-titel{font-size:21px; font-weight:900; color:var(--ink); line-height:1.1;}
+  .kaart-doel{font-size:12px; color:var(--accent2);}
+  .kaart-ga{font-size:14px; font-weight:bold; color:var(--c); display:flex; align-items:center; gap:7px;}
+  .kaart-ga .ico{width:17px; height:17px;}
+  .kaart-ga use{stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
+  .fase3-card{width:100%; flex-direction:row; align-items:center; gap:18px; padding:16px 18px;}
+  .fase3-card .kaart-ico{width:46px; height:46px; flex:none;}
+  .fase3-card .kaart-txt{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .fase3-card .kaart-ga{margin-left:auto; white-space:nowrap;}
+  .items.drie .kaart-link{height:100%;}
+  .items.drie .kaart-link .kaart-ga{margin-top:auto; padding-top:10px;}
+  .kaart-link.fase3-card{flex-direction:row; align-items:center; gap:14px;}
+  .kaart-link.fase3-card .kaart-ico{margin-bottom:0; width:34px; height:34px;}
+  .kaart-txt{display:flex; flex-direction:column; gap:3px; min-width:0;}
+  .kaart-link.fase3-card .kaart-ga{margin-left:auto; white-space:nowrap;}
+
+  .cyclusbtn{margin-top:12px; width:100%; font-family:inherit; cursor:pointer; background:var(--paper); border:1.5px dashed var(--c4); border-radius:11px; padding:11px 14px; display:flex; align-items:center; justify-content:center; gap:9px; font-size:12.5px; font-style:italic; font-weight:bold; color:var(--c4);}
+  .cyclusbtn:hover{background:var(--t4);}
+  .cyclusbtn:focus-visible{outline:3px solid #6FAC53; outline-offset:2px;}
+  .cyclusbtn .ico{width:18px; height:18px;}
+  .cyclusbtn use{stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+
+  .snelweg{font-size:13.5px; font-weight:900; color:var(--c2); line-height:1.5; margin:8px 0 14px 0;}
+  .snelweg .grijs{color:var(--accent2);}
+
+  /* Terug-knop */
+  .terug{font-family:inherit; font-size:13px; font-weight:bold; cursor:pointer; background:var(--paper); color:var(--ink); border:1.5px solid var(--ink); border-radius:999px; padding:9px 16px; display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;}
+  .terug:hover{background:var(--ink); color:#fff;}
+  .terug:focus-visible{outline:3px solid #6FAC53; outline-offset:2px;}
+  .terug .ico{width:15px; height:15px;}
+  .terug use{stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
+
+  /* Fiche */
+  .fiche{background:var(--paper); border:2px solid var(--border); border-top:7px solid var(--c,var(--ink)); border-radius:14px; padding:16px 20px 20px;}
+  .fiche.f2{--c:var(--c2); --t:var(--t2);}
+  .fiche.f3{--c:var(--c3); --t:var(--t3);}
+  .fiche.f4{--c:var(--c4); --t:var(--t4);}
+  .fiche-eyebrow{font-size:10px; font-weight:bold; letter-spacing:.15em; text-transform:uppercase; color:var(--c,var(--accent));}
+  .fiche-titelrij{display:flex; align-items:center; gap:12px; margin:2px 0 14px;}
+  .fiche-ico{width:32px; height:32px; color:var(--c); flex:none;}
+  .fiche-ico use{stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .fiche-titel{font-size:clamp(23px,5vw,31px); font-weight:900; line-height:1.02;}
+  .fiche-titel .accent{color:var(--c,var(--accent)); font-style:italic;}
+  .fiche-intro{background:var(--t); border:1.5px solid var(--c); border-radius:10px; padding:10px 14px; font-size:12.5px; margin-bottom:14px;}
+
+  .waarom{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;}
+  @media (max-width:640px){ .waarom{grid-template-columns:1fr;} }
+  .waarom .kolom{border-radius:10px; padding:12px 14px;}
+  .waarom .wel{background:var(--green-tint); border:1.5px solid var(--accent2);}
+  .waarom .niet{background:var(--niet-bg); border:1.5px solid var(--niet-border);}
+  .kolom-kop{display:flex; align-items:center; gap:9px; font-size:13px; font-weight:bold; margin-bottom:8px;}
+  .wel .kolom-kop{color:var(--accent);}
+  .niet .kolom-kop{color:var(--rood);}
+  .badge{flex:none; width:22px; height:22px;}
+  .waarom ul{list-style:none; display:grid; gap:6px;}
+  .waarom li{display:flex; gap:8px; font-size:12.5px; align-items:flex-start;}
+  .waarom li .mini{flex:none; width:15px; height:15px; margin-top:2px;}
+
+  .waarom-uitleg{background:var(--t,var(--green-tint)); border:1.5px solid var(--c,var(--accent2)); border-radius:10px; padding:11px 14px; font-size:12.5px; margin-bottom:16px;}
+  .waarom-uitleg b{color:var(--c,var(--accent2));}
+  .stappen-intro{font-size:11px; font-style:italic; color:var(--c,var(--accent2)); margin-bottom:10px;}
+  .stap-num-kop{}
+  .methode-lijst{display:grid; gap:8px; margin-top:6px;}
+  .methode{background:var(--softer); border:1.5px solid var(--border); border-radius:8px; padding:9px 12px; font-size:12px;}
+  .methode b{color:var(--ink);}
+  .tip{font-size:11.5px; font-style:italic; color:#555; margin-top:8px; padding-top:7px; border-top:1px solid var(--border);}
+
+  .brug{font-family:inherit; font-size:12.5px; font-weight:bold; cursor:pointer; background:var(--t,var(--green-tint)); color:var(--c,var(--accent)); border:1.5px solid var(--c,var(--accent2)); border-radius:10px; padding:10px 13px; display:flex; align-items:center; gap:9px; width:100%; text-align:left; margin-top:10px;}
+  .brug:hover{filter:brightness(.97);}
+  .brug:focus-visible{outline:3px solid #6FAC53; outline-offset:2px;}
+  .brug .ico{width:16px; height:16px; flex:none;}
+  .brug use{stroke:currentColor; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;}
+
+  .paden{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:6px;}
+  @media (max-width:640px){ .paden{grid-template-columns:1fr;} }
+  .pad{background:var(--softer); border:1.5px solid var(--border); border-radius:8px; padding:9px 11px; font-size:12px;}
+  .pad b{display:block; margin-bottom:4px;}
+
+  .reflvragen{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:6px;}
+  @media (max-width:640px){ .reflvragen{grid-template-columns:1fr;} }
+  .reflvraag{background:var(--softer); border:1.5px solid var(--border); border-radius:8px; padding:9px 11px; font-size:12px;}
+  .reflvraag b{display:block; margin-bottom:4px; color:var(--ink);}
+  .refl-goed{background:var(--green-tint); border:1.5px solid var(--accent2); border-radius:8px; padding:9px 12px; font-size:12.5px; margin-top:8px;}
+  .refl-goed b{color:var(--accent);}
+
+  .slogan{margin-top:20px; padding-top:16px; border-top:2px dashed var(--border); text-align:center;}
+  .slogan span{font-size:clamp(15px,3vw,20px); font-weight:900; font-style:italic; color:var(--ink);}
+  .slogan em{color:var(--accent); font-style:italic;}
+  .note{max-width:900px; margin:22px auto 0; font-size:11px; color:var(--accent2); text-align:center; font-style:italic;}
+  @media (prefers-reduced-motion: reduce){ .body, .chev{transition:none;} }
+</style>
+</head>
+<body>
+
+<!-- Symbolen -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="ic-down" viewBox="0 0 24 24"><path d="M12 4v13"/><path d="M6 12l6 7 6-7"/></symbol>
+  <symbol id="ic-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="ic-prep" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 4.2h6V7H9z"/><path d="M8.6 13l2 2 4-4"/></symbol>
+  <symbol id="ic-materiaal" viewBox="0 0 24 24"><path d="M4 7a2 2 0 012-2h3.5l2 2H18a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2z"/></symbol>
+  <symbol id="ic-begrepen" viewBox="0 0 24 24"><path d="M9.5 18h5"/><path d="M10 21h4"/><path d="M12 3a6 6 0 00-3.8 10.6c.6.5 1 1.2 1.1 2h5.4c.1-.8.5-1.5 1.1-2A6 6 0 0012 3z"/></symbol>
+  <symbol id="ic-planning" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9.5h16M8.5 3v4M15.5 3v4"/></symbol>
+  <symbol id="ic-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2 2 0 00-3-3L5 16z"/><path d="M14 7l3 3"/></symbol>
+  <symbol id="ic-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.5" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="ic-dumbbell" viewBox="0 0 24 24"><path d="M6.5 8v8M4 9.5v5M17.5 8v8M20 9.5v5M6.5 12h11"/></symbol>
+  <symbol id="ic-test" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8.5 10l1.8 1.8L14 8"/><path d="M9 15h6"/></symbol>
+  <symbol id="ic-cycle" viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-1 5"/><path d="M20 5v6h-6"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v6"/><circle cx="12" cy="16.4" r="0.7" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
+<div class="sheet">
+
+  <div class="top">
+    <div class="school">Montfortcollege Rotselaar</div>
+    <div class="title">Slim <span class="accent">studeren</span></div>
+    <div class="rule"></div>
+  </div>
+
+  <div class="demo-bar">
+    <div class="demo-text">Klik op een titel om de tekst te openen. Bij <b>verwerken</b>, <b>testen</b> en <b>na de toets</b> klik je door naar de fiche, met een knop kom je terug.</div>
+    <div class="toggle" role="group" aria-label="Toon-stand">
+      <button id="btn-titels" aria-pressed="true">Toon enkel titels</button>
+      <button id="btn-alles" aria-pressed="false">Toon alles</button>
+    </div>
+  </div>
+
+  <!-- ===================== OVERZICHT ===================== -->
+  <div class="view" id="view-overzicht">
+    <h2 id="kop-overzicht" tabindex="-1" style="position:absolute; left:-9999px;">Overzicht Slim studeren</h2>
+    <div class="flow">
+
+      <section class="fase f1">
+        <div class="fase-head"><div class="fase-num">1</div><div class="fase-naam">Voorbereiden</div><svg class="ico fase-ico"><use href="#ic-prep"/></svg></div>
+        <div class="noodzaak-box"><svg class="ico nb-ico"><use href="#ic-alert"/></svg><div><div class="noodzaak-titel">Materiaal <b>+</b> Begrepen <b>+</b> Planning</div><div class="noodzaak-sub">Deze drie eerst. Zonder deze basis is al de rest zinloos.</div></div></div>
+        <div class="items drie">
+          <details class="reveal"><summary><svg class="ico sum-ico"><use href="#ic-materiaal"/></svg>Materiaal <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Alles aanwezig? Cursus volledig en in orde?</p></div></div></div></details>
+          <details class="reveal"><summary><svg class="ico sum-ico"><use href="#ic-begrepen"/></svg>Begrepen? Hier start het studeren <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Alles begrepen uit de les? Snap je waar de lessenreeks naartoe gaat en wat je uiteindelijk moet kunnen? Zo niet, vraag het meteen aan je leerkracht. Pas als je het begrepen hebt, heeft verder studeren zin.</p></div></div></div></details>
+          <details class="reveal"><summary><svg class="ico sum-ico"><use href="#ic-planning"/></svg>Planning! <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Plan verschillende momenten in in je planner. Beter meerdere keren kort dan slechts de avond voor de toets lang.</p></div></div></div></details>
+        </div>
+      </section>
+
+      <div class="connector" aria-hidden="true"><svg class="ico"><use href="#ic-down"/></svg></div>
+
+      <section class="fase f2">
+        <div class="fase-head"><div class="fase-num">2</div><div class="fase-naam">Actief verwerken</div><svg class="ico fase-ico"><use href="#ic-pencil"/></svg></div>
+        <div class="items" style="margin-bottom:12px;">
+          <details class="reveal"><summary><svg class="ico sum-ico"><use href="#ic-cycle"/></svg>Hoe onthoud je het echt? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Niet door te herlezen tot het vlot voelt. Wel door de stof telkens opnieuw <b>zelf op te halen</b>, ook als het moeilijk gaat. Elke keer dat je iets met moeite terugvindt, wordt het steviger, tot het vanzelf komt. Zo maak je van een smal paadje een echte snelweg.</p><p style="margin-top:6px; color:#5F7F5B; font-style:italic;">Kort: snelwegen &rarr; vergeten &rarr; graven &rarr; nog steviger snelwegen.</p></div></div></div></details>
+        </div>
+        <div class="items drie">
+          <button class="kaart-link k1" data-goto="view-fiche1"><span class="kaart-tag">Fiche 1</span><svg class="ico kaart-ico"><use href="#ic-pencil"/></svg><span class="kaart-titel">Teksten en theorie verwerken</span><span class="kaart-doel">Voor tekst en theorie die je moet begrijpen en onthouden</span><span class="kaart-ga">Open fiche <svg class="ico"><use href="#ic-chev"/></svg></span></button>
+          <button class="kaart-link k2" data-goto="view-fiche2"><span class="kaart-tag">Fiche 2</span><svg class="ico kaart-ico"><use href="#ic-list"/></svg><span class="kaart-titel">Lijsten leren</span><span class="kaart-doel">Voor woordenschat, begrippen en rijtjes van buiten</span><span class="kaart-ga">Open fiche <svg class="ico"><use href="#ic-chev"/></svg></span></button>
+          <button class="kaart-link k3" data-goto="view-fiche3"><span class="kaart-tag">Fiche 3</span><svg class="ico kaart-ico"><use href="#ic-dumbbell"/></svg><span class="kaart-titel">Slim inoefenen</span><span class="kaart-doel">Voor stof die je ook moet kunnen toepassen</span><span class="kaart-ga">Open fiche <svg class="ico"><use href="#ic-chev"/></svg></span></button>
+        </div>
+        <div class="fase-logica" style="margin:12px 0 0 0;">Hier kies je: de methode die bij je vak past, of je wisselt af.</div>
+      </section>
+
+      <div class="connector" aria-hidden="true"><svg class="ico"><use href="#ic-down"/></svg></div>
+
+      <section class="fase f3">
+        <div class="fase-head"><div class="fase-num">3</div><div class="fase-naam">Jezelf testen</div><svg class="ico fase-ico"><use href="#ic-test"/></svg></div>
+        <div class="fase-logica">Cursus dicht, geen hulpmiddelen. Kan je het zelf oproepen?</div>
+        <button class="kaart-link k4 fase3-card" data-goto="view-fiche4"><svg class="ico kaart-ico"><use href="#ic-test"/></svg><span class="kaart-txt"><span class="kaart-label">Fiche 4</span><span class="kaart-titel">Jezelf testen</span><span class="kaart-doel">Controleer of het er echt in zit</span></span><span class="kaart-ga">Open fiche <svg class="ico"><use href="#ic-chev"/></svg></span></button>
+      </section>
+
+      <div class="connector" aria-hidden="true"><svg class="ico"><use href="#ic-down"/></svg></div>
+
+      <section class="fase f4">
+        <div class="fase-head"><div class="fase-num">4</div><div class="fase-naam">Na de toets</div><svg class="ico fase-ico"><use href="#ic-cycle"/></svg></div>
+        <div class="fase-logica">Reflecteer op je aanpak. Dit is tegelijk het einde en de start van je volgende ronde.</div>
+        <button class="kaart-link k5 fase3-card" data-goto="view-fiche5"><svg class="ico kaart-ico"><use href="#ic-cycle"/></svg><span class="kaart-txt"><span class="kaart-label">Fiche 5</span><span class="kaart-titel">Reflecteren</span><span class="kaart-doel">Wat werkte? Neem het mee</span></span><span class="kaart-ga">Open fiche <svg class="ico"><use href="#ic-chev"/></svg></span></button>
+        <button class="cyclusbtn" data-goto="view-overzicht"><svg class="ico"><use href="#ic-cycle"/></svg> En opnieuw: neem dit mee naar je volgende voorbereiding</button>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ===================== FICHE 1 ===================== -->
+  <div class="view" id="view-fiche1" hidden>
+    <button class="terug" data-goto="view-overzicht"><svg class="ico"><use href="#ic-back"/></svg> Terug naar het overzicht</button>
+    <section class="fiche f2">
+      <div class="fiche-eyebrow">Leerstrategie, fiche 1</div>
+      <div class="fiche-titelrij"><svg class="ico fiche-ico"><use href="#ic-pencil"/></svg><h2 class="fiche-titel" id="kop-fiche1" tabindex="-1">Teksten en theorie <span class="accent">verwerken</span></h2></div>
+      <div class="waarom">
+        <div class="kolom wel">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Maakt blijvende verbindingen</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>De stof actief omvormen in eigen woorden of structuur</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Gespreid herhalen, want één keer is niet genoeg</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Jezelf dwingen de stof op te roepen zonder te kijken</li>
+          </ul>
+        </div>
+        <div class="kolom niet">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Doen slechts kort onthouden</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Herlezen</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Overschrijven</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Markeren zonder ermee aan de slag te gaan</li>
+          </ul>
+        </div>
+      </div>
+      <div class="waarom-uitleg"><b>Snelwegen maken = actief omvormen + herhalen.</b> Herlezen en markeren voelen vertrouwd, maar je hersenen herkennen de stof enkel, zonder ze zelf te kunnen oproepen als het nodig is.</div>
+      <div class="stappen-intro">Klik elke stap open om te zien wat je doet.</div>
+      <div class="items">
+        <details class="reveal"><summary>Stap 1, bekijk eerst de structuur <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Vóór je begint te lezen, oriënteer je op het grote plaatje.</p><ul><li>Lees de inhoudstafel of het hoofdstukoverzicht</li><li>Scan alle titels, afbeeldingen en vetgedrukte woorden</li><li>Vraag jezelf: waarover gaat dit, wat weet ik hier al van?</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 2, lees actief <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Actief lezen begint al in de les. Schrijf bij elke alinea in de kantlijn:</p><ul><li>een kernwoord: waar gaat deze alinea over?</li><li>of een korte vraag: waarom, hoe, verschil?</li><li>zoek verbanden met wat je al weet, ook tussen hoofdstukken, en situeer het geheel</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 3, prent in <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p><b>Prent in = maak het van jou én haal het weer boven.</b> Veel leerlingen doen enkel het eerste en denken dat ze klaar zijn. Het tweede is wat het echt vastzet.</p><p style="margin-top:10px;"><b>Deel 1, maak het van jou (herkneed).</b> Kies de methode die bij jou past, of wissel af.</p><div class="methode-lijst"><div class="methode"><b>Samenvatting.</b> Alleen je kernwoorden, in je eigen woorden, maar met de juiste vaktermen, en met structuur. Maximaal een derde van de tekst. Je kan ze ter controle afgeven aan je vakleerkracht.</div><div class="methode"><b>Mindmap.</b> Hoofdonderwerp in het midden, hoofdtakken en subtakken, verbind wat samenhangt.</div><div class="methode"><b>Schema of tekening.</b> Maak het zelf, en oefen tot je het op een leeg blad kan reproduceren, niet enkel herkennen.</div><div class="methode"><b>Flashcards maken.</b> Vraag vooraan, antwoord in je eigen woorden achteraan. Eén vraag per kaartje.</div><div class="methode"><b>Uitleggen.</b> Boek dicht, leg uit aan iemand of aan jezelf. Loop je vast, dan weet je wat je nog moet studeren.</div></div><p style="margin-top:12px;"><b>Deel 2, haal het zelf weer boven.</b> Zonder te kijken:</p><ul><li>schrijf op wat je nog weet, overhoor jezelf of leg het uit</li><li>controleer wat ontbrak, en herhaal net dat gespreid</li></ul><button class="brug" data-goto="view-fiche4"><svg class="ico"><use href="#ic-chev"/></svg>Vlak voor de toets test je alles samen, zie fiche 4</button></div></div></div></details>
+        <details class="reveal"><summary>Stap 4, wat als het niet lukt? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Kijk terug naar je tekst. Waar liep je vast en waarom?</p><ul><li>Was je het vergeten? Herhaal het opnieuw, gespreid.</li><li>Had je het niet begrepen? Ga terug naar de cursus of vraag hulp.</li></ul></div></div></div></details>
+      </div>
+      <div class="slogan"><span>Zoek wat voor <em>jou</em> werkt. Werkt het niet meer? <em>Zoek verder.</em></span></div>
+    </section>
+  </div>
+
+  <!-- ===================== FICHE 2 ===================== -->
+  <div class="view" id="view-fiche2" hidden>
+    <button class="terug" data-goto="view-overzicht"><svg class="ico"><use href="#ic-back"/></svg> Terug naar het overzicht</button>
+    <section class="fiche f2">
+      <div class="fiche-eyebrow">Leerstrategie, fiche 2</div>
+      <div class="fiche-titelrij"><svg class="ico fiche-ico"><use href="#ic-list"/></svg><h2 class="fiche-titel" id="kop-fiche2">Lijsten <span class="accent">leren</span></h2></div>
+      <div class="waarom">
+        <div class="kolom wel">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Maakt blijvende verbindingen</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Gespreid leren over meerdere dagen</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Door elkaar leren</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Actief opschrijven zonder te kijken</li>
+          </ul>
+        </div>
+        <div class="kolom niet">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Doen slechts kort onthouden</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Lijst van voor naar achter overlopen</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Antwoorden enkel in je hoofd zeggen</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Altijd in dezelfde volgorde leren</li>
+          </ul>
+        </div>
+      </div>
+      <div class="waarom-uitleg"><b>Lijsten leren = gespreid + door elkaar + actief opschrijven.</b> Zo dwing je je hersenen om echt te zoeken. Dat is precies wat snelwegen maakt.</div>
+      <div class="stappen-intro">Klik elke stap open om te zien wat je doet.</div>
+      <div class="items">
+        <details class="reveal"><summary>Stap 1, gespreid leren <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><ul><li>Verdeel je lijst over meerdere dagen</li><li>Oefen elke dag kort: 10 minuten per dag werkt beter dan 1 uur op één avond</li><li>Herhaal na 1 dag, dan na 3 dagen, dan na een week</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 2, door elkaar leren <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><ul><li>Schud je lijst door elkaar of begin altijd ergens anders</li><li>Doe dit bij elke nieuwe oefenronde</li><li>Ken je het in elke volgorde? Dan zit het er écht in.</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 3, zelf testen <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Dek de antwoorden af en schrijf op wat je denkt, kijk daarna pas.</p><ul><li>Schrijf het antwoord op, in je hoofd zeggen is niet genoeg. Bij talen dwingt schrijven je ook de spelling te kennen.</li><li>Markeer wat fout was, dat krijgt extra aandacht in stap 4.</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 4, oefen het meest op wat je nog fout doet <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><ul><li>Maak een aparte lijst van wat fout was</li><li>Oefen die sublijst vaker en langer</li><li>Eindig met nog eens de volledige lijst door elkaar</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 5, kennen of kunnen gebruiken? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Je kent de woorden of begrippen. Maar stel jezelf de vraag:</p><ul><li>Moet ik dit enkel kennen, of ook kunnen gebruiken en toepassen?</li><li>Wordt dit getoetst in een zin, een oefening of een vertaling?</li><li>Ken ik het ook als ik het woord midden in een tekst tegenkom?</li></ul><button class="brug" data-goto="view-fiche3"><svg class="ico"><use href="#ic-chev"/></svg>Moet je het ook kunnen toepassen? Ga naar fiche 3, slim inoefenen</button></div></div></div></details>
+      </div>
+      <div class="slogan"><span>Zoek wat voor <em>jou</em> werkt. Werkt het niet meer? <em>Zoek verder.</em></span></div>
+    </section>
+  </div>
+
+  <!-- ===================== FICHE 3 ===================== -->
+  <div class="view" id="view-fiche3" hidden>
+    <button class="terug" data-goto="view-overzicht"><svg class="ico"><use href="#ic-back"/></svg> Terug naar het overzicht</button>
+    <section class="fiche f2">
+      <div class="fiche-eyebrow">Leerstrategie, fiche 3</div>
+      <div class="fiche-titelrij"><svg class="ico fiche-ico"><use href="#ic-dumbbell"/></svg><h2 class="fiche-titel" id="kop-fiche3">Slim <span class="accent">inoefenen</span></h2></div>
+      <div class="waarom">
+        <div class="kolom wel">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Maakt blijvende verbindingen</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Zelf maken zonder naar de oplossing te kijken</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Meteen verbeteren en fouten analyseren</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#4F8343"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Verschillende soorten oefeningen door elkaar</li>
+          </ul>
+        </div>
+        <div class="kolom niet">
+          <div class="kolom-kop"><svg class="badge" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>Doen slechts kort onthouden</div>
+          <ul>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Oefeningen enkel bekijken of volgen</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Alles op één avond maken</li>
+            <li><svg class="mini" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#b8503f"/><path d="M8 8l8 8M16 8l-8 8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>Fouten aankruisen zonder ze te begrijpen</li>
+          </ul>
+        </div>
+      </div>
+      <div class="waarom-uitleg"><b>Oefenen is geen rechte lijn maar een spiraal.</b> Je doorloopt de stappen regelmatig opnieuw, en elke ronde zit het beter. Alleen door zelf te maken, fouten te analyseren en te herhalen maak je echte snelwegen.</div>
+      <div class="stappen-intro">Klik elke stap open om te zien wat je doet.</div>
+      <div class="items">
+        <details class="reveal"><summary>Stap 1, ken je theorie eerst <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Oefenen zonder theorie heeft weinig zin. Studeer eerst actief in met fiche 1 en fiche 2, en bekijk de voorbeeldoefeningen en stappenplannen uit de les.</p><p><b>Durf uitleg te vragen</b> als iets niet lukt.</p></div></div></div></details>
+        <details class="reveal"><summary>Stap 2, maak oefeningen écht <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p><b>Durf te starten.</b> Pen op papier, <b>zonder naar de oplossing te kijken.</b></p><ul><li>Maak enkele oefeningen en verbeter daarna meteen in het groen</li><li>Werk in potlood en op papier, niet alles op de computer en dan wegvegen. Je fouten moeten zichtbaar blijven staan naast de verbetering, want daar leer je van.</li><li>Loop je vast? Neem een korte pauze en maak daarna een gelijkaardige oefening.</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Stap 3, analyseer je fouten <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Niet gewoon aankruisen. Kijk ook naar je tussenstappen, niet enkel het eindresultaat, en begrijp waarom het fout was:</p><div class="paden"><div class="pad"><b>Theorie niet gekend</b>Ga terug naar fiche 1 of 2 en studeer dat stuk opnieuw in.</div><div class="pad"><b>Aanpak niet begrepen</b>Bekijk een voorbeeldoefening of stappenplan stap voor stap en probeer opnieuw.</div><div class="pad"><b>Toevallige fout</b>Maak een gelijkaardige oefening om te controleren of het nu lukt.</div></div><p style="margin-top:8px;">Was alles juist? Ga dan meteen door naar jezelf testen.</p></div></div></div></details>
+        <details class="reveal"><summary>Stap 4, oefen verschillende soorten en meng <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><ul><li>Begin met oefeningen van hetzelfde type, breid dan uit naar andere types</li><li>Spring daarna door elkaar tussen alle soorten</li><li>Moet je echt zoeken welke aanpak je nodig hebt, ook in een hele andere situatie dan waarin je het leerde? Dan train je het echte denken.</li></ul><div class="tip">Dit is wat een toets ook doet: bereid je er zo op voor.</div></div></div></div></details>
+      </div>
+      <div class="slogan"><span>Zoek wat voor <em>jou</em> werkt. Werkt het niet meer? <em>Zoek verder.</em></span></div>
+    </section>
+  </div>
+
+  <!-- ===================== FICHE 4 ===================== -->
+  <div class="view" id="view-fiche4" hidden>
+    <button class="terug" data-goto="view-overzicht"><svg class="ico"><use href="#ic-back"/></svg> Terug naar het overzicht</button>
+    <section class="fiche f3">
+      <div class="fiche-eyebrow">Leerstrategie, fiche 4</div>
+      <div class="fiche-titelrij"><svg class="ico fiche-ico"><use href="#ic-test"/></svg><h2 class="fiche-titel" id="kop-fiche4">Jezelf <span class="accent">testen</span></h2></div>
+      <div class="fiche-intro">Je denkt dat je klaar bent. Nu boots je de toetssituatie na: cursus dicht, geen hulpmiddelen. Jezelf controleren met je cursus erbij is nog niet hetzelfde als jezelf testen.</div>
+      <div class="waarom-uitleg"><b>Waarom dit het belangrijkste is:</b> je herként de stof meestal nog wel, maar dat is niet hetzelfde als ze zelf kunnen oproepen. Alleen door ze zelf op te roepen, ook als het moeilijk voelt, graaf je de snelweg dieper. Hoe harder je graaft, hoe meer je onthoudt.</div>
+      <div class="stappen-intro">Test jezelf zoals de toets je zal testen. Twee hoofdmanieren:</div>
+      <div class="items">
+        <details class="reveal"><summary>Maak je eigen toets <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Kruip in het hoofd van je leerkracht.</p><ul><li>Denk na: wat zal er gevraagd worden? Welke soorten vragen, en wat werd in de les benadrukt?</li><li>Schrijf zelf <b>goede, moeilijke, verschillende</b> vragen, ook in een andere situatie dan waarin je het leerde. Geen makkelijke definitievraagjes.</li><li>Maak je eigen toets daarna <b>echt</b>, zonder te kijken, en verbeter in het groen.</li></ul></div></div></div></details>
+        <details class="reveal"><summary>Doe oude toetsen na <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Eerder gemaakte toetsen en oefeningen zijn de beste voorbereiding: ze tonen precies wat je nog niet beheerst.</p><ul><li>Maak ze opnieuw onder toetsomstandigheden: cursus dicht, geen hulp</li><li>Verbeter grondig in het groen en kom er later op terug</li></ul></div></div></div></details>
+      </div>
+      <div class="stappen-intro" style="margin-top:12px;">Andere manieren om jezelf op te roepen:</div>
+      <div class="items">
+        <details class="reveal"><summary>Braindump <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Neem een leeg blad en schrijf alles op wat je weet over een onderwerp, zonder te kijken. Als schema, tekening of opsomming. Vergelijk daarna met je cursus: wat ontbrak? Ga dat opnieuw instuderen.</p></div></div></div></details>
+        <details class="reveal"><summary>Je gemaakte kaartjes <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Gebruik de flashcards die je maakte, of een digitaal woordenboek of website. Probeer het antwoord op te roepen zonder te kijken, zeg of schrijf het, en kijk pas daarna of het klopt. Leg foute kaartjes apart en oefen die extra.</p></div></div></div></details>
+      </div>
+      <div class="waarom-uitleg" style="margin-top:14px;">Wat voor iedereen werkt: hou <b>enkele goede, moeilijke, verschillende oefeningen</b> over om jezelf mee te testen, en maak bij examens <b>eerder toetsenmateriaal</b> opnieuw. Bij vaknieuws vind je specifieke manieren, tools en apps om jezelf goed te testen.</div>
+      <button class="brug" data-goto="view-fiche5"><svg class="ico"><use href="#ic-cycle"/></svg>Na de toets: reflecteer op je aanpak</button>
+      <div class="slogan"><span>Zoek wat voor <em>jou</em> werkt. Werkt het niet meer? <em>Zoek verder.</em></span></div>
+    </section>
+  </div>
+
+  <!-- ===================== FICHE 5 ===================== -->
+  <div class="view" id="view-fiche5" hidden>
+    <button class="terug" data-goto="view-overzicht"><svg class="ico"><use href="#ic-back"/></svg> Terug naar het overzicht</button>
+    <section class="fiche f4">
+      <div class="fiche-eyebrow">Leerstrategie, fiche 5, reflectie</div>
+      <div class="fiche-titelrij"><svg class="ico fiche-ico"><use href="#ic-cycle"/></svg><h2 class="fiche-titel" id="kop-fiche5">Na de toets: <span class="accent">analyseer</span> jezelf</h2></div>
+      <div class="fiche-intro">Deze stap is tegelijk het einde en het begin: wat je hier leert over jezelf, neem je mee naar de volgende ronde. Kijk niet alleen naar je cijfer, maar naar wat je deze keer anders deed.</div>
+      <div class="stappen-intro">Klik open wat voor jou telt.</div>
+      <div class="items">
+        <details class="reveal"><summary>(Deels) tevreden? Kijk naar wat werkte <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Welke strategie of aanpak werkte voor jou? Benoem het concreet, want dan kan je het bewust opnieuw inzetten. Zie je verbetering, ook al is het resultaat nog niet perfect? Kleine stappen tellen.</p></div></div></div></details>
+        <details class="reveal"><summary>Liep er iets mis? Zoek waaraan het lag <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Zoek eerlijk uit waaraan het lag, en klik open wat op jou van toepassing is:</p><div class="subitems"><details class="reveal"><summary>Lag het aan de planning? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Te laat begonnen of te weinig herhaald? Volgende keer vroeger starten en spreiden.</p></div></div></div></details><details class="reveal"><summary>Lag het aan de studiemethode? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Welke strategie gebruikte je? Werkte die? Probeer een andere aanpak uit de fiches.</p></div></div></div></details><details class="reveal"><summary>Had je het niet goed begrepen? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Stel je vragen nog vóór de volgende toets, niet erna.</p></div></div></div></details><details class="reveal"><summary>Was je in vorm en gefocust? <svg class="ico chev"><use href="#ic-chev"/></svg></summary><div class="body"><div class="inner"><div class="inner-pad"><p>Genoeg geslapen, gezond ontbeten? En was je afgeleid, bijvoorbeeld door je gsm?</p></div></div></div></details></div></div></div></div></details>
+      </div>
+      <button class="brug" data-goto="view-overzicht" style="margin-top:14px;"><svg class="ico"><use href="#ic-cycle"/></svg>Begin de volgende ronde slimmer, terug naar het overzicht</button>
+      <div class="slogan"><span>Zoek wat voor <em>jou</em> werkt. Werkt het niet meer? <em>Zoek verder.</em></span></div>
+    </section>
+  </div>
+
+</div>
+
+<p class="note">Werkversie met kleurcodering per fase en herkenbare symbolen. Enkele keuzes liggen nog niet definitief vast (de exacte naam van fiche 1 en de slogan).</p>
+
+<script>
+  (function(){
+    var views = Array.prototype.slice.call(document.querySelectorAll('.view'));
+    function toon(id){
+      views.forEach(function(v){ v.hidden = (v.id !== id); });
+      // Naar de bovenkant bij een echte doorklik. scrollIntoView werkt ook
+      // wanneer de pagina ingebed is in een iframe (bv. via Wix), waar
+      // window.scrollTo enkel het binnenframe zou verzetten.
+      window.scrollTo(0, 0);
+      var top = document.querySelector('.top');
+      if(top && top.scrollIntoView){ top.scrollIntoView({ block: 'start', inline: 'nearest' }); }
+      var kop = document.getElementById('kop-' + id.replace('view-',''));
+      if(kop && kop.focus){ try { kop.focus({ preventScroll: true }); } catch(e){ kop.focus(); } }
+    }
+    document.querySelectorAll('[data-goto]').forEach(function(el){
+      el.addEventListener('click', function(){ toon(el.getAttribute('data-goto')); });
+    });
+
+    var btnTitels = document.getElementById('btn-titels');
+    var btnAlles  = document.getElementById('btn-alles');
+    var reveals   = Array.prototype.slice.call(document.querySelectorAll('details.reveal'));
+    function setAll(open){
+      reveals.forEach(function(d){ d.open = open; });
+      btnAlles.setAttribute('aria-pressed', open ? 'true':'false');
+      btnTitels.setAttribute('aria-pressed', open ? 'false':'true');
+    }
+    btnTitels.addEventListener('click', function(){ setAll(false); });
+    btnAlles.addEventListener('click', function(){ setAll(true); });
+    reveals.forEach(function(d){
+      d.addEventListener('toggle', function(){
+        var allOpen = reveals.every(function(x){ return x.open; });
+        var allClosed = reveals.every(function(x){ return !x.open; });
+        btnAlles.setAttribute('aria-pressed', allOpen ? 'true':'false');
+        btnTitels.setAttribute('aria-pressed', allClosed ? 'true':'false');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
